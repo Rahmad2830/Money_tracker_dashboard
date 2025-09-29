@@ -1,0 +1,61 @@
+{% extends "partials/base.html" %}
+{% load humanize %}
+
+{% block title %}Transaksi{% endblock %}
+
+{% block content %}
+<div x-data="{ isOpen: false }" class="p-3 p-md-4">
+  <h1>Transaksi</h1>
+  <!-- toggle modal -->
+  <button @click="isOpen = !isOpen" class="btn btn-primary d-flex align-items-center">
+    <i class="bi bi-plus fs-3"></i>
+    <span>Tambah</span>
+  </button>
+  <!-- modal -->
+  <div x-show="isOpen" @click.outside="isOpen = false" x-transition.duration.500 class="position-fixed top-50 start-50 translate-middle bg-white shadow p-3 border border-dark-subtle rounded-3" style="width:65%;z-index:9999">
+    <h2 class="h3">Tambah Kategori</h2>
+    <form method="POST" action="{% url 'transaksi' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary">Tambah</button>
+    </form>
+  </div>
+  <!-- end modal -->
+  <div class="table-responsive mt-3">
+  <table class="table table-striped">
+    <tr>
+      <th>No</th>
+      <th>Tanggal</th>
+      <th>Jenis</th>
+      <th>Kategori</th>
+      <th>Jumlah</th>
+      <th>Aksi</th>
+    </tr>
+    {% if data %}
+    {% for transaksi in data %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ transaksi.created_at|date:"d/m/Y H:i" }}</td>
+      <td>{{ transaksi.get_jenis_display }}</td>
+      <td>{{ transaksi.kategori_transaksi }}</td>
+      <td>Rp.{{ transaksi.jumlah|intcomma }}</td>
+      <td>
+        <div class="d-flex gap-2 align-items-center">
+          <form method="POST" action="{% url 'hapus_data' 'Transaksi' transaksi.id %}">
+            {% csrf_token %}
+            <button class="btn btn-danger">Hapus</button>
+          </form>
+          <a href="{% url 'edit_transaksi' transaksi.id %}" class="btn btn-warning">Edit</a>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+      <td colspan="6" class="text-center">Data transaksi masih kosong</td>
+    </tr>
+    {% endif %}
+  </table>
+  </div>
+</div>
+{% endblock %}

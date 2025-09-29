@@ -1,0 +1,47 @@
+.wrapper {
+  display: flex;
+}
+.sidebar-mobile {
+  width: 320px;
+  height: 100vh;
+}
+.sidebar-desktop {
+  width: 320px;
+  height: 100vh;
+}
+.link:hover {
+  border: 1px solid gray;
+  border-radius: 15px;
+}
+main {
+  flex: 1;
+}
+.myChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+@media (max-width: 768px) {
+  .sidebar-mobile {
+    display: block;
+  }
+  .sidebar-desktop {
+    display: none;
+  }
+  .open-sidebar {
+    display: block;
+  }
+}
+@media (min-width: 768px) {
+  .sidebar-mobile {
+    display: none;
+  }
+  .sidebar-desktop {
+    display: block;
+  }
+  .open-sidebar {
+    display: none;
+  }
+  main {
+    margin-left: 320px;
+  }
+}

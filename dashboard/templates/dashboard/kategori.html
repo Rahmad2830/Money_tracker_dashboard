@@ -1,0 +1,54 @@
+{% extends "partials/base.html" %}
+
+{% block title %}Kategori{% endblock %}
+
+{% block content %}
+<div x-data="{ isOpen: false }" class="p-3 p-md-4">
+  <h1>Kategori</h1>
+  <!-- modal toggle -->
+  <button @click="isOpen = !isOpen" class="btn btn-primary d-flex align-items-center">
+    <i class="bi bi-plus fs-3"></i>
+    <span>Tambah</span>
+  </button>
+  <!-- modal -->
+  <div x-show="isOpen" @click.outside="isOpen = false" x-transition.duration.500 class="position-fixed top-50 start-50 translate-middle bg-white shadow p-3 border border-dark-subtle rounded-3" style="width:65%;z-index:9999">
+    <h2 class="h3">Tambah Kategori</h2>
+    <form method="POST" action="{% url 'kategori' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary">Tambah</button>
+    </form>
+  </div>
+  <!-- end modal -->
+  <table class="table table-striped mt-3">
+    <tr>
+      <th>No</th>
+      <th>Kategori</th>
+      <th>Tanggal Buat</th>
+      <th>Aksi</th>
+    </tr>
+    {% if data %}
+    {% for kategori in data %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ kategori.kategori }}</td>
+      <td>{{ kategori.created_at|date:"d/m/Y H:i" }}</td>
+      <td>
+        <div class="d-flex gap-2 align-items-center">
+          <form method="POST" action="{% url 'hapus_data' 'Kategori' kategori.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Hapus</button>
+          </form>
+          <a href="{% url 'edit_kategori' kategori.id %}" class="btn btn-warning">Edit</a>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+      <td colspan="4" class="text-center">Data Masih Kosong</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+{% endblock %}

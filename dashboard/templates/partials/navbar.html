@@ -1,0 +1,16 @@
+<nav class="bg-white w-100 shadow p-1">
+  <div class="d-flex justify-content-between align-items-center">
+    <button @click="$store.sidebar.open()" class="btn open-sidebar"><i class="bi bi-list"></i></button>
+    <div x-data="{ isOpen: false }" class="ms-auto position-relative">
+      <button @click="isOpen = !isOpen" @click.outside="isOpen = false" class="btn"><i class="bi bi-person-circle fs-3"></i></button>
+      <div x-show="isOpen" x-transition.duration.500 class="position-absolute top-100 bg-white shadow rounded-3 p-2" style="width:100px; right: 10px">
+        <div class="my-2">
+          <a href="" class="text-decoration-none text-dark link p-2">Profile</a>
+        </div>
+        <div class="my-2">
+          <a href="{% url 'sign_out' %}" class="text-decoration-none text-dark link p-2">Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

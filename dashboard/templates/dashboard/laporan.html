@@ -1,0 +1,197 @@
+{% extends "partials/base.html" %}
+{% load humanize %}
+
+{% block title %}Laporan{% endblock %}
+
+{% block content %}
+<div class="p-3 p-md-4">
+  <h1>Laporan</h1>
+  <!-- chart -->
+  <div class="row mt-3">
+    <div class="col-12">
+      <div class="border border-dark-subtle rounded-4 p-4 shadow">
+        <div class="row align-items-center">
+          <div class="col-lg-9">
+            <h2 class="h3">Laporan Tahunan</h2>
+            <form method="get" class="mt-3 d-flex flex-wrap gap-3">
+              <label for="tahun">Pilih tahun:</label>
+              <select id="tahun" name="tahun" class="form-select-sm">
+                {% for i in tahun_list %}
+                <option value="{{ i }}" {% if i == tahun_sekarang %}selected{% endif %}>{{ i }}</option>
+                {% endfor %}
+              </select>
+              <select id="bulan" name="bulan" class="form-select-sm">
+                {% for i in bulan_list %}
+                <option value="{{ i }}" {% if i == bulan_sekarang %}selected{% endif %}>{{ i }}</option>
+                {% endfor %}
+              </select>
+              <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary">Cari Laporan</button>
+                <a href="{% url 'transaksi_tahunan' tahun_sekarang %}" class="btn btn-info">Lihat Transaksi</a>
+              </div>
+            </form>
+            <!-- chart -->
+            <canvas id="yearChart" class="myChart mt-3"></canvas>
+            <!-- endchart -->
+          </div>
+          <div class="col-lg-3">
+            <div class="p-3 p-md-4 border border-dark-subtle rounded-4 shadow-sm">
+              <h2 class="h4">Pemasukan Tahunan</h2>
+              <h2 class="h4">Rp {{ total_pemasukan_tahunan|intcomma }}</h2>
+            </div>
+            <div class="p-3 p-md-4 border border-dark-subtle rounded-4 mt-3 shadow-sm">
+              <h2 class="h4">Pengeluaran Tahunan</h2>
+              <h2 class="h4">Rp {{ total_pengeluaran_tahunan|intcomma }}</h2>
+            </div>
+            <div class="p-3 p-md-4 border border-dark-subtle rounded-4 mt-3 shadow-sm">
+              <h2 class="h4">Saldo Tahunan</h2>
+              <h2 class="h4">Rp {{ total_saldo_tahunan|intcomma }}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- laporan bulanan -->
+    <div class="col-12 mt-4">
+      <div class="border border-dark-subtle rounded-4 p-4 shadow">
+        <h1 class="h3">Laporan Bulanan</h1>
+        <a href="{% url 'transaksi_bulanan' tahun_sekarang bulan_sekarang %}" class="btn btn-info mt-3">Lihat Transaksi Bulanan</a>
+        <div class="row mt-3">
+          <div class="col-lg-6">
+            <!-- chart bulanan -->
+            <canvas id="monthChart" class="myChart"></canvas>
+          </div>
+          <div class="col-lg-3 m-auto align-self-center">
+            <div class="p-3 p-md-4 border border-dark-subtle rounded-4 shadow-sm">
+              <h2 class="h4">Pemasukan Bulanan</h2>
+              <h2 class="h4">Rp {{ pemasukan_bulanan|intcomma }}</h2>
+            </div>
+            <div class="p-3 p-md-4 border border-dark-subtle rounded-4 mt-3 shadow-sm">
+              <h2 class="h4">Pengeluaran Bulanan</h2>
+              <h2 class="h4">Rp {{ pengeluaran_bulanan|intcomma }}</h2>
+            </div>
+            <div class="p-3 p-md-4 border border-dark-subtle rounded-4 mt-3 shadow-sm">
+              <h2 class="h4">Saldo Bulanan</h2>
+              <h2 class="h4">Rp {{ total_saldo_bulanan|intcomma }}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end laporan bulanan -->
+    <div class="col-lg-6 mt-4">
+      <div class="border border-dark-subtle rounded-4 p-4 shadow">
+        <h2 class="h3">Rincian per Kategori Tahunan</h2>
+        <div class="table-responsive mt-3">
+          <table class="table table-striped">
+            <tr>
+              <th>No</th>
+              <th>Kategori</th>
+              <th>Jumlah</th>
+            </tr>
+            {% if total_by_kategori %}
+            {% for total in total_by_kategori %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ total.kategori_transaksi__kategori }}</td>
+              <td>Rp {{ total.total|intcomma }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mt-4">
+      <div class="border border-dark-subtle rounded-4 p-4 shadow">
+        <h2 class="h3">Perbandingan dengan tahun sebelumnya</h2>
+        <div class="table-responsive mt-3">
+          <table class="table table-striped">
+            <tr>
+              <th>No</th>
+              <th>Tahun</th>
+              <th>Pemasukan</th>
+              <th>Pengeluaran</th>
+              <th>saldo</th>
+            </tr>
+            {% for tahun, nilai in perbandingan_tahunan.items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ tahun }}</td>
+              <td>Rp {{ nilai.pemasukan|intcomma }}</td>
+              <td>Rp {{ nilai.pengeluaran|intcomma }}</td>
+              <td>Rp {{ nilai.saldo|intcomma }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="2" class="text-center">Selisih</td>
+              <td>Rp {{ yoy.pemasukan|intcomma }}</td>
+              <td>Rp {{ yoy.pengeluaran|intcomma }}</td>
+              <td>Rp {{ yoy.saldo|intcomma }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctx = document.getElementById("yearChart")
+  const ctx2 = document.getElementById("monthChart")
+  
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ["Januari", "Febuari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
+      datasets: [
+        {
+        label: "Total Pemasukan",
+        data: {{ pemasukan|safe }},
+        borderWidth: 1,
+        borderColor: "green",
+        backgroundColor: "green"
+        },
+        {
+        label: "Total Pengeluaran",
+        data: {{ pengeluaran|safe }},
+        borderWidth: 1,
+        borderColor: "red",
+        backgroundColor: "red"
+        }
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  })
+  
+  new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: {{ labels|safe }},
+      datasets: [
+        {
+        data: {{ data_bulanan_per_kategori|safe }},
+        borderWidth: 1,
+        }
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  })
+  
+  
+</script>
+{% endblock %}

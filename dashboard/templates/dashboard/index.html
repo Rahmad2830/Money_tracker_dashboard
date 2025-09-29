@@ -1,0 +1,129 @@
+{% extends "partials/base.html" %}
+{% load humanize %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+<div class="p-3 p-md-4">
+  <h1>Dashboard</h1>
+  <div class="row mt-3 mt-lg-5">
+    <div class="col-lg-4 mt-3 mt-lg-0">
+      <div class="rounded-4 shadow-sm border border-dark-subtle p-4 d-flex justify-content-between align-items-center bg-warning">
+        <div>
+          <h2 class="h4">Total saldo</h2>
+          <h2 class="h4">Rp.{{ saldo|intcomma }}</h2>
+        </div>
+        <i class="bi bi-wallet2 display-1 opacity-25"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 mt-3 mt-lg-0">
+      <div class="rounded-4 shadow-sm border border-dark-subtle p-4 d-flex justify-content-between align-items-center bg-success text-white">
+        <div>
+          <h2 class="h4">Pemasukan</h2>
+          <h2 class="h4">Rp.{{ pemasukan|intcomma }}</h3>
+        </div>
+        <i class="bi bi-box-arrow-in-down-left display-1 opacity-25"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 mt-3 mt-lg-0">
+      <div class="rounded-4 shadow-sm border border-dark-subtle p-4 d-flex justify-content-between align-items-center bg-danger text-white">
+        <div>
+          <h2 class="h4">Pengeluaran</h2>
+          <h2 class="h4">Rp.{{ pengeluaran|intcomma }}</h2>
+        </div>
+        <i class="bi bi-box-arrow-right display-1 opacity-25"></i>
+      </div>
+    </div>
+  </div>
+  <!-- chart -->
+  <div class="row mt-5">
+    <div class="col-lg-6">
+      <div class="border border-dark-subtle rounded-4 p-4">
+        <h1 class="h3">Grafik bulan ini</h1>
+        <canvas id="myChart" class="myChart"></canvas>
+      </div>
+    </div>
+    <!-- top pemasukan -->
+    <div class="col-lg-6 mt-3 mt-lg-0">
+      <div class="row">
+        <div class="col-12">
+          <div class="border border-dark-subtle rounded-4 p-4">
+            <h1 class="h3">Top pemasukan bulan ini</h1>
+            <div class="table-responsive mt-3">
+              <table class="table table-striped">
+                <tr>
+                  <th>No</th>
+                  <th>Tanggal</th>
+                  <th>Jenis</th>
+                  <th>Kategori</th>
+                  <th>Jumlah</th>
+                </tr>
+                {% for t in top_pemasukan %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ t.created_at|date:"d/m/Y" }}</td>
+                  <td>{{ t.get_jenis_display }}</td>
+                  <td>{{ t.kategori_transaksi.kategori }}</td>
+                  <td>Rp {{ t.jumlah|intcomma }}</td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- top pengeluaran -->
+        <div class="col-12 mt-4">
+          <div class="border border-dark-subtle rounded-4 p-4">
+            <h1 class="h3">Top pengeluaran bulan ini</h1>
+            <div class="table-responsive mt-3">
+              <table class="table table-striped">
+                <tr>
+                  <th>No</th>
+                  <th>Tanggal</th>
+                  <th>Jenis</th>
+                  <th>Kategori</th>
+                  <th>Jumlah</th>
+                </tr>
+                {% for t in top_pengeluaran %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ t.created_at|date:"d/m/Y" }}</td>
+                  <td>{{ t.get_jenis_display }}</td>
+                  <td>{{ t.kategori_transaksi.kategori }}</td>
+                  <td>Rp {{ t.jumlah|intcomma }}</td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- end top pengeluaran -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctx = document.getElementById("myChart")
+  
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ["pemasukan", "pengeluaran"],
+      datasets: [{
+        data: [{{ pemasukan }}, {{ pengeluaran }}],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  })
+</script>
+{% endblock %}
