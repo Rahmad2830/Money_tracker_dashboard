@@ -4,7 +4,7 @@ import csv
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from dashboard.forms import *
 from django.apps import apps
 from dashboard.models import Kategori, Transaksi
@@ -35,7 +35,18 @@ def index(request):
   
 @login_required(login_url="sign_in")
 def kategori(request):
-  data = Kategori.objects.all()
+  query = request.GET.get("q", "")
+  data = Kategori.objects.all().order_by("-created_at")
+  if query:
+    data = data.filter(
+      Q(kategori__icontains=query)|
+      Q(created_at__day__icontains=query)|
+      Q(created_at__month__icontains=query)|
+      Q(created_at__year__icontains=query)
+    )
+  paginator = Paginator(data, 20)
+  page_number = request.GET.get("page")
+  data_kategori = paginator.get_page(page_number)
   if request.method == "POST":
     form = KategoriForm(request.POST)
     if form.is_valid():
@@ -43,7 +54,7 @@ def kategori(request):
       return redirect("kategori")
   else:
     form = KategoriForm()
-  return render(request, "dashboard/kategori.html", {'form':form, 'data':data})
+  return render(request, "dashboard/kategori.html", {'form':form, 'data':data_kategori, 'query': query})
   
 @login_required(login_url="sign_in")
 def edit_kategori(request, pk):
@@ -59,7 +70,19 @@ def edit_kategori(request, pk):
 
 @login_required(login_url="sign_in")
 def transaksi(request):
-  data = Transaksi.objects.all()
+  query = request.GET.get("q", "")
+  data = Transaksi.objects.all().order_by("-created_at")
+  if query:
+    data = data.filter(
+      Q(kategori_transaksi__kategori__icontains=query)|
+      Q(jenis__icontains=query)|
+      Q(created_at__day__icontains=query)|
+      Q(created_at__month__icontains=query)|
+      Q(created_at__year__icontains=query)
+    )
+  paginator = Paginator(data, 50)
+  page_number = request.GET.get("page")
+  data_transaksi = paginator.get_page(page_number)
   if request.method == "POST":
     form = TransaksiForm(request.POST)
     if form.is_valid():
@@ -67,7 +90,7 @@ def transaksi(request):
       return redirect("transaksi")
   else:
     form = TransaksiForm()
-  return render(request, "dashboard/transaksi.html", {'form':form, 'data':data})
+  return render(request, "dashboard/transaksi.html", {'form':form, 'data':data_transaksi, 'query': query})
 
 @login_required(login_url="sign_in")
 def edit_transaksi(request, pk):
@@ -198,6 +221,10 @@ def transaksi_bulanan(request, tahun, bulan):
   return render(request, "dashboard/transaksi_bulanan.html", {'tahun': tahun, 'bulan': bulan, 'transaksi': transaksi_page})
   
 @login_required(login_url="sign_in")
+def settings(request):
+  return render(request, "dashboard/settings.html")
+
+@login_required(login_url="sign_in")
 def export_csv(request, tahun=None, bulan=None):
   qs = Transaksi.objects.all()
   
@@ -223,3 +250,4 @@ def export_csv(request, tahun=None, bulan=None):
     ])
     
   return response
+  

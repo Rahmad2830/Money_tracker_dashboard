@@ -34,15 +34,15 @@
   <div class="d-flex justify-content-center gap-3 align-items-center mt-3">
     {% if transaksi.has_previous %}
     <a href="?page={{ transaksi.previous_page_number }}" class="btn btn-outline-secondary">
-      <i class="bi bi-chevron-double-left fs-3"></i>
+      <i class="bi bi-chevron-double-left fs-4"></i>
     </a>
     {% endif %}
     
-    <span>Halaman {{ transaksi.number }} dari {{ transaksi.paginator.num_pages }}</span>
+    <span>Halaman {{ transaksi.number }}/{{ transaksi.paginator.num_pages }}</span>
     
     {% if transaksi.has_next %}
     <a href="?page={{ transaksi.next_page_number }}" class="btn btn-outline-secondary">
-      <i class="bi bi-chevron-double-right fs-3"></i>
+      <i class="bi bi-chevron-double-right fs-4"></i>
     </a>
     {% endif %}
   </div>

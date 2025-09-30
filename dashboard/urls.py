@@ -15,4 +15,5 @@ urlpatterns = [
   path("laporan/transaksi_bulanan/<int:tahun>/<int:bulan>", views.transaksi_bulanan, name="transaksi_bulanan"),
   path("export_tahunan/<int:tahun>", views.export_csv, name="export_tahunan"),
   path("export_tahunan/<int:tahun>/<int:bulan>", views.export_csv, name="export_bulanan"),
+  path("settings/", views.settings, name='settings')
 ]

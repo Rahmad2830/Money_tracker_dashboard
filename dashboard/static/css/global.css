@@ -20,6 +20,9 @@ main {
   width: 100% !important;
   height: 100% !important;
 }
+.login {
+  width: 90%;
+}
 @media (max-width: 768px) {
   .sidebar-mobile {
     display: block;
@@ -43,5 +46,13 @@ main {
   }
   main {
     margin-left: 320px;
+  }
+  .login {
+    width: 40%;
+  }
+}
+@media (min-width: 992px) {
+  .login {
+    width: 25%;
   }
 }
