@@ -8,6 +8,7 @@ from django.db.models import Sum, Q
 from dashboard.forms import *
 from django.apps import apps
 from dashboard.models import Kategori, Transaksi
+from django_ratelimit.decorators import ratelimit
 
 # Create your views here.
 @login_required(login_url='sign_in')
@@ -34,6 +35,7 @@ def index(request):
   return render(request, "dashboard/index.html", context)
   
 @login_required(login_url="sign_in")
+@ratelimit(key='user_or_ip', rate='20/m', block=True)
 def kategori(request):
   query = request.GET.get("q", "")
   data = Kategori.objects.all().order_by("-created_at")
@@ -69,6 +71,7 @@ def edit_kategori(request, pk):
   return render(request, "dashboard/edit_kategori.html", {'form': form, 'data': obj})
 
 @login_required(login_url="sign_in")
+@ratelimit(key='user_or_ip', rate='20/m', block=True)
 def transaksi(request):
   query = request.GET.get("q", "")
   data = Transaksi.objects.all().order_by("-created_at")
